@@ -28,7 +28,7 @@ v2ray_conf="${v2ray_conf_dir}/config.json"
 nginx_conf="${nginx_conf_dir}/v2ray.conf"
 
 #生成伪装路径
-camouflage=`cat /dev/urandom | head -n 10 | md5sum | head -c 8`
+camouflage=blog
 
 source /etc/os-release
 
