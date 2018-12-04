@@ -145,12 +145,12 @@ dependency_install(){
 port_alterid_set(){
     stty erase '^H' && read -p "请输入连接端口（default:443）:" port
     [[ -z ${port} ]] && port="443"
-    stty erase '^H' && read -p "请输入alterID（default:64）:" alterID
-    [[ -z ${alterID} ]] && alterID="64"
+    stty erase '^H' && read -p "请输入alterID（default:255）:" alterID
+    [[ -z ${alterID} ]] && alterID="255"
 }
 modify_port_UUID(){
     let PORT=$RANDOM+10000
-    UUID=$(cat /proc/sys/kernel/random/uuid)
+    UUID=fea41d6f-9764-4822-9289-f007409ff55b
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
     sed -i "/\"alterId\"/c \\\t  \"alterId\":${alterID}" ${v2ray_conf}
@@ -284,8 +284,8 @@ v2ray_conf_add(){
     "settings": {
       "clients": [
         {
-          "id": "b831381d-6324-4d53-ad4f-8cda48b30811",
-          "alterId": 64
+          "id": "fea41d6f-9764-4822-9289-f007409ff55b",
+          "alterId": 255
         }
       ]
     },
