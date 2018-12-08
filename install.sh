@@ -163,7 +163,8 @@ modify_nginx(){
     fi
     sed -i "1,/listen/{s/listen 443 ssl;/listen ${port} ssl;/}" ${v2ray_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-    sed -i "1,/proxy_pass/ \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
+    sed -i "/location \/blog\//c \\\tlocation \/${camouflage}\/" ${nginx_conf}
+    sed -i "/proxy_pass http:\/\/127.0.0.1:10000;/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
     sed -i "27i \\\tproxy_intercept_errors on;"  /etc/nginx/nginx.conf
 }
@@ -310,7 +311,6 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 443 ssl http2;
-		listen [::]:443 ssl http2;
         ssl on;
         ssl_certificate       /etc/v2ray/v2ray.crt;
         ssl_certificate_key   /etc/v2ray/v2ray.key;
@@ -340,7 +340,6 @@ nginx_conf_add(){
 }
     server {
         listen 80;
-		listen [::]:80 ;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
