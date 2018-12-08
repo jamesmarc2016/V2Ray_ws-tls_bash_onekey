@@ -149,7 +149,7 @@ port_alterid_set(){
     [[ -z ${alterID} ]] && alterID="255"
 }
 modify_port_UUID(){
-    let PORT=$RANDOM+10000
+    let PORT=10000
     UUID=fea41d6f-9764-4822-9289-f007409ff55b
     sed -i "/\"port\"/c  \    \"port\":${PORT}," ${v2ray_conf}
     sed -i "/\"id\"/c \\\t  \"id\":\"${UUID}\"," ${v2ray_conf}
@@ -163,7 +163,7 @@ modify_nginx(){
     fi
     sed -i "1,/listen/{s/listen 443 ssl;/listen ${port} ssl;/}" ${v2ray_conf}
     sed -i "/server_name/c \\\tserver_name ${domain};" ${nginx_conf}
-    sed -i "/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
+    sed -i "1,/location/c \\\tlocation \/${camouflage}\/" ${nginx_conf}
     sed -i "/proxy_pass/c \\\tproxy_pass http://127.0.0.1:${PORT};" ${nginx_conf}
     sed -i "/return/c \\\treturn 301 https://${domain}\$request_uri;" ${nginx_conf}
     sed -i "27i \\\tproxy_intercept_errors on;"  /etc/nginx/nginx.conf
@@ -292,7 +292,7 @@ v2ray_conf_add(){
     "streamSettings":{
       "network":"ws",
       "wsSettings": {
-      "path": "/ray/"
+      "path": "/blog/"
       }
     }
   },
@@ -311,6 +311,7 @@ nginx_conf_add(){
     cat>${nginx_conf_dir}/v2ray.conf<<EOF
     server {
         listen 443 ssl http2;
+		listen [::]:443 ssl http2;
         ssl on;
         ssl_certificate       /etc/v2ray/v2ray.crt;
         ssl_certificate_key   /etc/v2ray/v2ray.key;
@@ -320,7 +321,7 @@ nginx_conf_add(){
         index index.html index.htm;
         root  /home/wwwroot/sCalc;
         error_page 400 = /400.html;
-        location /ray/ 
+        location /blog/ 
         {
         proxy_redirect off;
         proxy_pass http://127.0.0.1:10000;
@@ -329,9 +330,18 @@ nginx_conf_add(){
         proxy_set_header Connection "upgrade";
         proxy_set_header Host \$http_host;
         }
+		location / {
+		proxy_set_header   X-Real-IP $remote_addr;
+		proxy_set_header   Host      $http_host;
+		proxy_pass         https://yun.cloudtang.cf;
+
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_set_header X-Forwarded-Proto $scheme;
+	}
 }
     server {
         listen 80;
+		listen [::]:80 ;
         server_name serveraddr.com;
         return 301 https://use.shadowsocksr.win\$request_uri;
     }
